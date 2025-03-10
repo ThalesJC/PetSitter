@@ -1,13 +1,20 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"PetSitter/database"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+func welcome(context *fiber.Ctx) error {
+	return context.SendString("Bem vindo ao PetSitter!")
+}
 
 func main() {
+	database.ConnectDB()
 	app := fiber.New()
 
-	app.Get("/", func(context *fiber.Ctx) error {
-		return context.SendString("Hello, World!")
-	})
+	app.Get("/", welcome)
 
-	app.Listen(":3000")
+	app.Listen(":8080")
 }
