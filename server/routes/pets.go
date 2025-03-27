@@ -1,8 +1,10 @@
 package routes
 
+import "gorm.io/gorm"
+
 type Pet struct {
-	ID        uint   `json:"id" gorm:"primaryKey"`
-	TutorId   string `json:"tutor_id" gorm:"foreignKey:ID"`
+	gorm.Model
+	User      User
 	Name      string `json:"name"`
 	BirthDate string `json:"birth_date"`
 	Weight    string `json:"weight"`
