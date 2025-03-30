@@ -12,7 +12,7 @@ type User struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
-	Pets      []Pet  `json:"pets" gorm:"foreignKey:ID"`
+	Pets      []Pet  `json:"pets"`
 }
 
 func CreateResponseUser(userModel models.User) User {
@@ -22,9 +22,8 @@ func CreateResponseUser(userModel models.User) User {
 		pets[i] = Pet{
 			ID:        pet.ID,
 			Name:      pet.Name,
-			TutorId:   pet.TutorId,
+			Tutor:     CreateResponseUser(pet.Tutor),
 			BirthDate: pet.BirthDate,
-			Weight:    pet.Weight,
 			Size:      pet.Size,
 			Species:   pet.Species,
 			Gender:    pet.Gender,
@@ -52,7 +51,7 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	database.Database.Db.Create(&user)
+	database.Petsitter.Db.Create(&user)
 	response := CreateResponseUser(user)
 
 	return c.Status(200).JSON(response)
@@ -61,7 +60,7 @@ func CreateUser(c *fiber.Ctx) error {
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
 
-	database.Database.Db.Find(&users)
+	database.Petsitter.Db.Find(&users)
 
 	responseUsers := []User{}
 	for _, user := range users {
@@ -76,7 +75,7 @@ func GetUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	user := models.User{}
 
-	database.Database.Db.Preload("Pets").First(&user, id)
+	database.Petsitter.Db.Preload("Pets").First(&user, id)
 
 	if user.ID == 0 {
 		return c.Status(404).JSON("User not found")
@@ -91,7 +90,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	user := models.User{}
 
-	database.Database.Db.First(&user, id)
+	database.Petsitter.Db.First(&user, id)
 
 	if user.ID == 0 {
 		return c.Status(404).JSON("User not found")
@@ -102,7 +101,7 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	database.Database.Db.Save(&user)
+	database.Petsitter.Db.Save(&user)
 
 	return c.Status(200).JSON(user)
 }
@@ -111,13 +110,13 @@ func DeleteUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	user := models.User{}
 
-	database.Database.Db.First(&user, id)
+	database.Petsitter.Db.First(&user, id)
 
 	if user.ID == 0 {
 		return c.Status(404).JSON("User not found")
 	}
 
-	database.Database.Db.Delete(&user)
+	database.Petsitter.Db.Delete(&user)
 
 	return c.Status(204).JSON(nil)
 }

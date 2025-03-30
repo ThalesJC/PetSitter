@@ -9,5 +9,5 @@ type User struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
-	Pets      []Pet     `json:"pets" gorm:"foreignKey:ID"`
+	Pets      []Pet     `json:"pets"`
 }

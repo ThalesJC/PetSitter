@@ -14,7 +14,7 @@ type DbInstace struct {
 	Db *gorm.DB
 }
 
-var Database DbInstace
+var Petsitter DbInstace
 
 func ConnectDB() {
 	dsn := "host=localhost user=postgres password=postgres dbname=petsitter port=5432 sslmode=disable TimeZone=America/Sao_Paulo"
@@ -33,5 +33,5 @@ func ConnectDB() {
 
 	db.AutoMigrate(&models.User{}, &models.Pet{})
 
-	Database = DbInstace{Db: db}
+	Petsitter = DbInstace{Db: db}
 }
