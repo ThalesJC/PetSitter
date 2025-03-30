@@ -5,9 +5,11 @@ import (
 	"PetSitter/models"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type User struct {
+	gorm.Model
 	ID        uint   `json:"id" gorm:"primaryKey"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -20,7 +22,6 @@ func CreateResponseUser(userModel models.User) User {
 
 	for i, pet := range userModel.Pets {
 		pets[i] = Pet{
-			ID:        pet.ID,
 			Name:      pet.Name,
 			Tutor:     CreateResponseUser(pet.Tutor),
 			BirthDate: pet.BirthDate,
