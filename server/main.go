@@ -21,6 +21,9 @@ func setupRoutes(app *fiber.App) {
 	pets := api.Group("/pets")
 	pets.Post("/", routes.CreatePet)
 	pets.Get("/:id", routes.GetPets)
+	pets.Get("/userID::userID/petID::petID", routes.GetPetById)
+	pets.Put("/:id", routes.UpdatePet)
+	pets.Delete("/:id", routes.DeletePet)
 }
 
 func main() {

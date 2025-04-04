@@ -118,8 +118,93 @@ func GetPets(c *fiber.Ctx) error {
 	return c.Status(200).JSON(responsePets)
 }
 
+func GetPetById(c *fiber.Ctx) error {
+	queries := c.AllParams()
+
+	userID := queries["userID"]
+	petID := queries["petID"]
+
+	if userID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "User ID is required",
+		})
+	}
+
+	if petID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Pet ID is required",
+		})
+	}
+
+	var pet models.Pet
+	if err := database.Petsitter.Db.
+		Where("id = ? AND user_id = ?", petID, userID).
+		First(&pet).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": "Pet not found for this user",
+		})
+	}
+
+	var user models.User
+	database.Petsitter.Db.First(&user, userID)
+
+	response := CreateResponsePet(pet, user)
+	return c.Status(200).JSON(response)
+}
+
+func UpdatePet(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	pet := models.Pet{}
+
+	if err := database.Petsitter.Db.First(&pet, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": "Pet not found",
+		})
+	}
+
+	if err := c.BodyParser(&pet); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	if err := database.Petsitter.Db.Save(&pet).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error updating pet",
+		})
+	}
+
+	user := models.User{}
+	database.Petsitter.Db.First(&user, pet.UserID)
+	responsePet := CreateResponsePet(pet, user)
+	return c.Status(200).JSON(responsePet)
+}
+
+func DeletePet(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	pet := models.Pet{}
+
+	if err := database.Petsitter.Db.First(&pet, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": "Pet not found",
+		})
+	}
+
+	if err := database.Petsitter.Db.Delete(&pet).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error deleting pet",
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Pet deleted successfully",
+	})
+}
+
 func parseBirthDate(dateStr string) time.Time {
-	layout := "2006-01-02 15:04:05"
+	layout := "2006-01-02"
 	birthDate, err := time.Parse(layout, dateStr)
 	if err != nil {
 		return time.Time{}
