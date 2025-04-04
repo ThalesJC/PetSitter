@@ -8,7 +8,6 @@ import (
 
 type Pet struct {
 	gorm.Model
-	User      User      `json:"user"`
 	UserID    uint      `json:"user_id"`
 	Name      string    `json:"name"`
 	BirthDate time.Time `json:"birth_date"`

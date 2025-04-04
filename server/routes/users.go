@@ -19,8 +19,10 @@ func CreateResponseUser(userModel models.User) User {
 
 	for i, pet := range userModel.Pets {
 		pets[i] = Pet{
+			ID:        pet.ID,
+			UserID:    pet.UserID,
+			Weight:    pet.Weight,
 			Name:      pet.Name,
-			User:      CreateResponseUser(pet.User),
 			BirthDate: pet.BirthDate,
 			Size:      pet.Size,
 			Species:   pet.Species,
@@ -37,7 +39,6 @@ func CreateResponseUser(userModel models.User) User {
 		Email: userModel.Email,
 		Pets:  pets,
 	}
-
 }
 
 func CreateUser(c *fiber.Ctx) error {
@@ -57,7 +58,7 @@ func CreateUser(c *fiber.Ctx) error {
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
 
-	database.Petsitter.Db.Find(&users)
+	database.Petsitter.Db.Preload("Pets").Find(&users)
 
 	responseUsers := []User{}
 	for _, user := range users {
