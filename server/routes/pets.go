@@ -24,6 +24,8 @@ type Pet struct {
 
 func CreateResponsePet(petModel models.Pet, user models.User) Pet {
 	return Pet{
+		ID:        petModel.ID,
+		UserID:    petModel.UserID,
 		Name:      petModel.Name,
 		BirthDate: petModel.BirthDate,
 		Weight:    petModel.Weight,
@@ -79,6 +81,41 @@ func CreatePet(c *fiber.Ctx) error {
 	database.Petsitter.Db.Create(&pet)
 
 	return c.Status(200).JSON(pet)
+}
+
+func GetPets(c *fiber.Ctx) error {
+	userID := c.Params("id")
+
+	if userID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "User ID is required",
+		})
+	}
+
+	pets := []models.Pet{}
+
+	result := database.Petsitter.Db.Where("user_id = ?", userID).Find(&pets)
+	if result.Error != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error retrieving pets",
+		})
+	}
+
+	if len(pets) == 0 {
+		return c.Status(404).JSON(fiber.Map{
+			"error": "No pets found for this user",
+		})
+	}
+
+	responsePets := []Pet{}
+	for _, pet := range pets {
+		var user models.User
+		database.Petsitter.Db.First(&user, pet.UserID)
+		newPet := CreateResponsePet(pet, user)
+		responsePets = append(responsePets, newPet)
+	}
+
+	return c.Status(200).JSON(responsePets)
 }
 
 func parseBirthDate(dateStr string) time.Time {

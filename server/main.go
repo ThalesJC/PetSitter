@@ -20,6 +20,7 @@ func setupRoutes(app *fiber.App) {
 
 	pets := api.Group("/pets")
 	pets.Post("/", routes.CreatePet)
+	pets.Get("/:id", routes.GetPets)
 }
 
 func main() {
