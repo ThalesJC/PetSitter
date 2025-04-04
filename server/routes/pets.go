@@ -9,8 +9,7 @@ import (
 )
 
 type Pet struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Tutor     User      `json:"tutor"`
+	User      User
 	Name      string    `json:"name"`
 	BirthDate time.Time `json:"birth_date"`
 	Weight    float32   `json:"weight"`
@@ -22,11 +21,9 @@ type Pet struct {
 	Picture   string    `json:"picture"`
 }
 
-func CreateResponsePet(petModel models.Pet, tutor User) Pet {
+func CreateResponsePet(petModel models.Pet, user models.User) Pet {
 	return Pet{
-		ID:        petModel.ID,
 		Name:      petModel.Name,
-		Tutor:     tutor,
 		BirthDate: petModel.BirthDate,
 		Weight:    petModel.Weight,
 		Size:      petModel.Size,
@@ -43,11 +40,27 @@ func CreatePet(c *fiber.Ctx) error {
 
 	err := c.BodyParser(&pet)
 	if err != nil {
-		return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	if pet.UserID == 0 {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "UserID is required to associate the pet with a user",
+		})
+	}
+
+	var user models.User
+	if result := database.Petsitter.Db.First(&user, pet.UserID); result.Error != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": "User not found",
+		})
 	}
 
 	database.Petsitter.Db.Create(&pet)
-	response := CreateResponsePet(pet, User{})
+
+	response := CreateResponsePet(pet, user)
 
 	return c.Status(200).JSON(response)
 }

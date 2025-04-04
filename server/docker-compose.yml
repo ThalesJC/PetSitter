@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgresql
+    image: postgres
     container_name: petsitter_db
     environment:
       POSTGRES_USER: postgres

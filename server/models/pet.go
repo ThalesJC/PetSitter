@@ -1,11 +1,15 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Pet struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time `json:"created_at"`
-	Tutor     User      `json:"tutor"`
+	gorm.Model
+	User      User      `json:"user"`
+	UserID    uint      `json:"user_id"`
 	Name      string    `json:"name"`
 	BirthDate time.Time `json:"birth_date"`
 	Weight    float32   `json:"weight"`
