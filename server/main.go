@@ -3,27 +3,35 @@ package main
 import (
 	"PetSitter/database"
 	"PetSitter/routes"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func setupRoutes(app *fiber.App) {
-	// Users Routes
-	app.Post("api/v1/users", routes.CreateUser)
-	app.Get("api/v1/users", routes.GetUsers)
-	app.Get("api/v1/users/:id", routes.GetUser)
-	app.Put("api/v1/users/:id", routes.UpdateUser)
-	app.Delete("api/v1/users/:id", routes.DeleteUser)
+	api := app.Group("/api/v1")
 
-	// Pets Routes
-	app.Post("api/v1/pets", routes.CreatePet)
+	users := api.Group("/users")
+	users.Post("/", routes.CreateUser)
+	users.Get("/", routes.GetUsers)
+	users.Get("/:id", routes.GetUser)
+	users.Put("/:id", routes.UpdateUser)
+	users.Delete("/:id", routes.DeleteUser)
+
+	pets := api.Group("/pets")
+	pets.Post("/", routes.CreatePet)
 }
 
 func main() {
 	database.ConnectDB()
+
 	app := fiber.New()
 
 	setupRoutes(app)
 
-	app.Listen(":8080")
+	log.Println("🚀 Servidor rodando em http://localhost:8080")
+
+	if err := app.Listen("0.0.0.0:8080"); err != nil {
+		log.Fatalf("Erro ao iniciar o servidor: %v", err)
+	}
 }
