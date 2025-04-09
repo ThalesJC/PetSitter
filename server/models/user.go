@@ -1,13 +1,13 @@
 package models
 
-import "time"
+import (
+	"gorm.io/gorm"
+)
 
 type User struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time `json:"created_at"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	Pets      []Pet     `json:"pets" gorm:"foreignKey:ID"`
+	gorm.Model
+	Name         string `json:"name"`
+	Email        string `json:"email" gorm:"unique"`
+	PasswordHash string `json:"-"`
+	AuthProvider string `json:"auth_provider"`
 }

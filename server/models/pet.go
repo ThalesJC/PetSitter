@@ -1,18 +1,22 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Pet struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time `json:"created_at"`
-	TutorId   string    `json:"tutor_id" gorm:"foreignKey:ID"`
-	Name      string    `json:"name"`
-	BirthDate string    `json:"birth_date"`
-	Weight    string    `json:"weight"`
-	Size      string    `json:"size"`
-	Species   string    `json:"species"`
-	Gender    string    `json:"gender"`
-	Neutered  bool      `json:"neutered"`
+	gorm.Model
+	Birthdate time.Time `json:"birthdate"`
+	Breed     string    `json:"breed"`
 	CoatColor string    `json:"coat_color"`
-	Picture   string    `json:"picture"`
+	Name      string    `json:"name"`
+	Neutered  bool      `json:"neutered"`
+	PhotoUrl  string    `json:"photo_url"`
+	Sex       string    `json:"sex"`
+	Size      byte      `json:"size"`
+	Species   string    `json:"species"`
+	UserID    uint      `json:"user_id"`
+	Weight    float32   `json:"weight"`
 }

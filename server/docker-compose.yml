@@ -1,6 +1,6 @@
 services:
   database:
-    image: bitnami/postgresql:latest
+    image: postgres
     container_name: petsitter_db
     environment:
       POSTGRES_USER: postgres
@@ -10,11 +10,15 @@ services:
       - "5432:5432"
     volumes:
       - ./petsitter-data:/var/lib/postgresql/data
-    networks:
-      - petsitter-network
 
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: petsitter_backend
+    volumes:
+      - .:/app
+      - air_tmp:/tmp
     ports:
       - "8080:8080"
     depends_on:
@@ -25,20 +29,6 @@ services:
       DB_USER: "postgres"
       DB_PASSWORD: "postgres"
       DB_NAME: "petsitter"
-    networks:
-      - petsitter-network
-  
-  pgadmin: 
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "thales.soul96@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "*Teuc#pgadmin992269956*"
-    ports:
-      - "5050:80"
-    networks:
-      - petsitter-network
 
-networks:
-  petsitter-network:
-    external: true
+volumes:
+  air_tmp:
