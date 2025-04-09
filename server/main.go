@@ -2,7 +2,7 @@ package main
 
 import (
 	"PetSitter/database"
-	middleware "PetSitter/middlware"
+	"PetSitter/middleware"
 	"PetSitter/routes"
 	"log"
 
@@ -12,15 +12,17 @@ import (
 func setupRoutes(app *fiber.App) {
 	api := app.Group("/api/v1")
 
+	api.Post("/register", routes.Register)
 	api.Post("/login", routes.Login)
-	api.Post("/refresh-token", routes.RefreshToken)
+	api.Post("/token/refresh", routes.RefreshToken)
 
-	users := api.Group("/users", middleware.JWTMiddleware)
-	users.Post("/", routes.CreateUser)
-	users.Get("/", routes.GetUsers)
-	users.Get("/:id", routes.GetUser)
-	users.Put("/:id", routes.UpdateUser)
-	users.Delete("/:id", routes.DeleteUser)
+	// TODO: remover essa rota
+	api.Get("/user/all", routes.GetUsers)
+
+	protected := api.Group("", middleware.JWTMiddleware)
+	protected.Get("/me", routes.Me)
+	protected.Put("/me", routes.UpdateMe)
+	protected.Delete("/me", routes.DeleteMe)
 
 	pets := api.Group("/pets", middleware.JWTMiddleware)
 	pets.Post("/", routes.CreatePet)

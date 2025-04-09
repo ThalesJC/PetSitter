@@ -10,5 +10,4 @@ type User struct {
 	Email        string `json:"email" gorm:"unique"`
 	PasswordHash string `json:"-"`
 	AuthProvider string `json:"auth_provider"`
-	Pets         []Pet  `json:"pets"`
 }
