@@ -8,14 +8,15 @@ import (
 
 type Pet struct {
 	gorm.Model
-	UserID    uint      `json:"user_id"`
+	Birthdate time.Time `json:"birthdate"`
+	Breed     string    `json:"breed"`
+	CoatColor string    `json:"coat_color"`
 	Name      string    `json:"name"`
-	BirthDate time.Time `json:"birth_date"`
-	Weight    float32   `json:"weight"`
+	Neutered  bool      `json:"neutered"`
+	PhotoUrl  string    `json:"photo_url"`
+	Sex       string    `json:"sex"`
 	Size      byte      `json:"size"`
 	Species   string    `json:"species"`
-	Gender    string    `json:"gender"`
-	Neutered  bool      `json:"neutered"`
-	CoatColor string    `json:"coat_color"`
-	Picture   string    `json:"picture"`
+	UserID    uint      `json:"user_id"`
+	Weight    float32   `json:"weight"`
 }

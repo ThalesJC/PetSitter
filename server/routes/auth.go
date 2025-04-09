@@ -15,9 +15,10 @@ const fifteenMinutes = 15 * time.Minute
 const sevenDays = 7 * 24 * time.Hour
 
 type RegisterRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name          string `json:"name"`
+	Email         string `json:"email"`
+	Password      string `json:"password"`
+	Auth_provider string `json:"auth_provider"`
 }
 
 func Register(c *fiber.Ctx) error {
@@ -31,7 +32,7 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	if req.Name == "" || req.Email == "" || req.Password == "" {
+	if missingFieldsOnRequest(req) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "All fields are required",
 		})
@@ -55,6 +56,7 @@ func Register(c *fiber.Ctx) error {
 		Name:         req.Name,
 		Email:        req.Email,
 		PasswordHash: string(hashedPassword),
+		AuthProvider: req.Auth_provider,
 	}
 
 	if err := database.Petsitter.Db.Create(&user).Error; err != nil {
@@ -71,6 +73,13 @@ func Register(c *fiber.Ctx) error {
 		"token":         token,
 		"refresh_token": refreshToken,
 	})
+}
+
+func missingFieldsOnRequest(req RegisterRequest) bool {
+	if req.Name == "" || req.Email == "" || req.Password == "" || req.Auth_provider == "" {
+		return true
+	}
+	return false
 }
 
 type LoginRequest struct {

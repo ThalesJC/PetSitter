@@ -19,17 +19,19 @@ func setupRoutes(app *fiber.App) {
 	// TODO: remover essa rota
 	api.Get("/user/all", routes.GetUsers)
 
-	protected := api.Group("", middleware.JWTMiddleware)
+	protected := api.Use(middleware.JWTMiddleware)
+
+	// User routes
 	protected.Get("/me", routes.Me)
 	protected.Put("/me", routes.UpdateMe)
 	protected.Delete("/me", routes.DeleteMe)
 
-	pets := api.Group("/pets", middleware.JWTMiddleware)
-	pets.Post("/", routes.CreatePet)
-	pets.Get("/:id", routes.GetPets)
-	pets.Get("/userID::userID/petID::petID", routes.GetPetById)
-	pets.Put("/:id", routes.UpdatePet)
-	pets.Delete("/:id", routes.DeletePet)
+	// Pet routes
+	protected.Post("/pets", routes.CreatePet)
+	protected.Get("/pets", routes.GetAllPets)
+	protected.Get("/pets/:id", routes.GetPetByID)
+	protected.Put("/pets/:id", routes.UpdatePet)
+	protected.Delete("/pets/:id", routes.DeletePet)
 }
 
 func main() {
